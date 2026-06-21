@@ -1050,18 +1050,19 @@ document.getElementById('fin').addEventListener('change',e=>{if(e.target.files.l
 const dz=document.getElementById('dz');
 dz.addEventListener('click',()=>document.getElementById('fin').click());
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
-  // — Auto-load latest vape data from repo —
-  fetch('data/vape.json?_=' + Date.now())
-    .then(r => { if (!r.ok) throw new Error('no data'); return r.json(); })
-    .then(rows => {
-          if (!Array.isArray(rows) || !rows.length) return;
-          allRows = rows;
-          allHeaders = Object.keys(rows[0]).filter(h => h !== '__p');
-          buildMapper();
-    })
-    .catch(() => { /* no vape data file yet */ });
 dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
 dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files.length)loadFiles(e.dataTransfer.files);});
+
+// ── SHARED DATA HUB BRIDGE ───────────────────────────────────────────────────
+// Receives files pushed from the suite shell (index.html) and runs them
+// through the same loadFiles() pipeline the manual uploader uses. The column
+// mapper still appears for a one-time confirm — that logic stays untouched.
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'ocs-hub-files') return;
+  const files = e.data.files || [];
+  if (!files.length) return;
+  try { loadFiles(files); } catch (err) { console.error('Hub data load failed:', err); }
+});
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OCS Suite · MeraHub</title>
+<title>OCS Suite · Buddy Blooms</title>
 <style>
 :root{
   --bg:#0a0c10;
@@ -16,6 +16,7 @@
   --lime:#b5f04c;
   --amber:#f59e0b;
   --green:#22c08a;
+  --red:#f15a5a;
   --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
   --mono:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',monospace;
 }
@@ -35,12 +36,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .brand-name{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text);}
 .brand-sub{font-size:10.5px;color:var(--muted);letter-spacing:.02em;padding-left:16px;}
 
+/* SHARED DATA HUB BUTTON */
+.hub-launch{
+  margin:14px 12px 0;padding:11px 12px;border-radius:9px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;cursor:pointer;width:calc(100% - 24px);
+  transition:border-color .14s;text-align:left;
+}
+.hub-launch:hover{border-color:var(--lime);}
+.hub-launch-icon{
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(181,240,76,.1);border:1px solid rgba(181,240,76,.3);color:var(--lime);
+}
+.hub-launch-icon svg{width:14px;height:14px;}
+.hub-launch-text{flex:1;min-width:0;}
+.hub-launch-title{font-size:12px;font-weight:600;color:var(--text);}
+.hub-launch-sub{font-size:10.5px;color:var(--muted);margin-top:1px;}
+.hub-launch-badge{
+  min-width:20px;height:20px;padding:0 6px;border-radius:10px;
+  background:var(--lime);color:#0a0c10;font-size:11px;font-weight:700;
+  display:none;align-items:center;justify-content:center;flex-shrink:0;
+}
+
 .nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
 .nav-item{
   display:flex;align-items:flex-start;gap:11px;
   padding:11px 12px;border-radius:9px;cursor:pointer;
   border:1px solid transparent;border-left:2px solid transparent;
-  background:transparent;text-align:left;width:100%;
+  background:transparent;text-align:left;width:100%;position:relative;
   transition:background .14s, border-color .14s;
 }
 .nav-item:hover{background:var(--surface2);}
@@ -60,6 +84,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .nav-item[data-key="wholesale"]{--item-accent:var(--amber);}
 .nav-item[data-key="vape"]{--item-accent:var(--green);}
 .nav-item.active{border-left-color:var(--item-accent);}
+.nav-sync-dot{
+  position:absolute;top:9px;right:9px;width:6px;height:6px;border-radius:50%;
+  background:var(--lime);box-shadow:0 0 6px var(--lime);display:none;
+}
+.nav-item.synced .nav-sync-dot{display:block;}
 
 .sidebar-foot{padding:14px 20px 18px;border-top:1px solid var(--border);}
 .foot-line{font-size:10.5px;color:var(--muted2);line-height:1.6;}
@@ -76,8 +105,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .crumb-sep{color:var(--muted2);}
 .topbar-actions{display:flex;align-items:center;gap:14px;}
 .topbar-link{
-  font-size:11.5px;color:var(--muted);text-decoration:none;
+  font-size:11.5px;color:var(--muted);text-decoration:none;cursor:pointer;
   display:flex;align-items:center;gap:5px;transition:color .14s;
+  background:none;border:none;font-family:var(--font);
 }
 .topbar-link:hover{color:var(--text);}
 .topbar-link svg{width:12px;height:12px;}
@@ -87,14 +117,74 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 
 /* MOBILE */
 @media(max-width:880px){
-  .sidebar{position:fixed;width:100%;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid var(--border);}
+  .sidebar{position:fixed;width:100%;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid var(--border);flex-wrap:wrap;}
   .brand{display:none;}
-  .nav{flex-direction:row;padding:10px;overflow-x:auto;overflow-y:hidden;}
+  .hub-launch{width:auto;margin:10px;order:1;}
+  .nav{flex-direction:row;padding:10px;overflow-x:auto;overflow-y:hidden;order:2;width:100%;}
   .nav-item{flex:0 0 auto;width:auto;flex-direction:row;}
   .nav-desc{display:none;}
   .sidebar-foot{display:none;}
-  .main{left:0;top:64px;}
+  .main{left:0;top:118px;}
 }
+
+/* SHARED DATA HUB MODAL */
+.hub-overlay{
+  position:fixed;inset:0;background:rgba(6,7,9,.78);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;z-index:100;padding:24px;
+}
+.hub-overlay.on{display:flex;}
+.hub-modal{
+  width:100%;max-width:620px;max-height:84vh;display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden;
+}
+.hub-head{
+  padding:18px 22px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0;
+}
+.hub-title{font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.hub-sub{font-size:11.5px;color:var(--muted);line-height:1.5;max-width:440px;}
+.hub-close{
+  background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;transition:background .14s,color .14s;
+}
+.hub-close:hover{background:var(--surface2);color:var(--text);}
+
+.hub-body{padding:18px 22px;overflow-y:auto;flex:1;}
+.hub-dz{
+  border:1.5px dashed var(--border);border-radius:10px;padding:26px 16px;text-align:center;
+  cursor:pointer;transition:border-color .14s,background .14s;margin-bottom:14px;
+}
+.hub-dz:hover,.hub-dz.drag-over{border-color:var(--lime);background:rgba(181,240,76,.04);}
+.hub-dz-text{font-size:12.5px;color:var(--text);font-weight:600;margin-bottom:3px;}
+.hub-dz-sub{font-size:10.5px;color:var(--muted);}
+
+.hub-list{display:flex;flex-direction:column;gap:6px;}
+.hub-empty{font-size:11.5px;color:var(--muted2);text-align:center;padding:18px 0;}
+.hub-item{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:11.5px;
+}
+.hub-item-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-family:var(--mono);font-size:11px;}
+.hub-item-date{flex-shrink:0;color:var(--lime);font-size:10.5px;font-weight:600;min-width:64px;text-align:right;}
+.hub-item-date.nodate{color:var(--amber);}
+.hub-item-size{flex-shrink:0;color:var(--muted);font-size:10.5px;min-width:50px;text-align:right;}
+.hub-item-del{
+  flex-shrink:0;background:none;border:none;color:var(--muted2);cursor:pointer;
+  width:20px;height:20px;border-radius:5px;font-size:11px;transition:color .14s,background .14s;
+}
+.hub-item-del:hover{color:var(--red);background:var(--bg);}
+
+.hub-foot{
+  padding:14px 22px;border-top:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.hub-count{font-size:11px;color:var(--muted);}
+.hub-clear{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-size:11px;padding:7px 12px;border-radius:7px;cursor:pointer;transition:border-color .14s,color .14s;
+}
+.hub-clear:hover{border-color:var(--red);color:var(--red);}
 </style>
 </head>
 <body>
@@ -108,6 +198,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     <div class="brand-sub">Buddy Blooms · internal tools</div>
   </div>
 
+  <button class="hub-launch" onclick="openHub()">
+    <div class="hub-launch-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+    </div>
+    <div class="hub-launch-text">
+      <div class="hub-launch-title">Shared Data</div>
+      <div class="hub-launch-sub" id="hubLaunchSub">Drop monthly files once</div>
+    </div>
+    <div class="hub-launch-badge" id="hubBadge">0</div>
+  </button>
+
   <nav class="nav" id="nav">
     <button class="nav-item" data-key="pricing" data-src="pricing-intelligence.html" data-label="Pricing Intelligence">
       <div class="nav-icon">
@@ -117,6 +218,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
         <div class="nav-title">Pricing Intelligence</div>
         <div class="nav-desc">Landed-cost calculator &amp; market price positioning</div>
       </div>
+      <div class="nav-sync-dot" title="Loaded from shared data"></div>
     </button>
 
     <button class="nav-item" data-key="wholesale" data-src="wholesale-dashboard.html" data-label="Wholesale Dashboard">
@@ -127,6 +229,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
         <div class="nav-title">Wholesale Dashboard</div>
         <div class="nav-desc">Monthly OCS sales trends, rankings &amp; comparisons</div>
       </div>
+      <div class="nav-sync-dot" title="Loaded from shared data"></div>
     </button>
 
     <button class="nav-item" data-key="vape" data-src="vape-flavour-intelligence.html" data-label="Vape Flavour Intelligence">
@@ -137,6 +240,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
         <div class="nav-title">Vape Flavour Intelligence</div>
         <div class="nav-desc">Fruit-flavour share &amp; SKU performance for vapes</div>
       </div>
+      <div class="nav-sync-dot" title="Loaded from shared data"></div>
     </button>
   </nav>
 
@@ -149,6 +253,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   <div class="topbar">
     <div class="topbar-title">OCS Suite <span class="crumb-sep">/</span> <b id="crumbLabel">Pricing Intelligence</b></div>
     <div class="topbar-actions">
+      <button class="topbar-link" onclick="openHub()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        Shared data
+      </button>
       <a class="topbar-link" id="openNewTab" href="pricing-intelligence.html" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
         Open in new tab
@@ -160,35 +268,223 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   </div>
 </div>
 
+<!-- SHARED DATA HUB MODAL -->
+<div class="hub-overlay" id="hubOverlay">
+  <div class="hub-modal">
+    <div class="hub-head">
+      <div>
+        <div class="hub-title">Shared Data</div>
+        <div class="hub-sub">Drop your monthly OCS export files here once. Every tool in the sidebar reads from this same set automatically — no need to upload separately in each one.</div>
+      </div>
+      <button class="hub-close" onclick="closeHub()">✕</button>
+    </div>
+    <div class="hub-body">
+      <div class="hub-dz" id="hubDz">
+        <input type="file" id="hubInput" multiple accept=".xlsx,.xls,.csv" style="display:none">
+        <div class="hub-dz-text">Drag files here, or click to browse</div>
+        <div class="hub-dz-sub">.xlsx, .xls, .csv — multiple files OK</div>
+      </div>
+      <div class="hub-list" id="hubList">
+        <div class="hub-empty">No files yet — drop your monthly OCS exports above.</div>
+      </div>
+    </div>
+    <div class="hub-foot">
+      <span class="hub-count" id="hubCount">0 files loaded</span>
+      <button class="hub-clear" onclick="clearAllHubFiles()">Clear all</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// ════════════════════════════════════════════════════════════════════════════
+//  TAB SWITCHER
+// ════════════════════════════════════════════════════════════════════════════
 const navItems = document.querySelectorAll('.nav-item');
 const frame = document.getElementById('toolFrame');
 const crumb = document.getElementById('crumbLabel');
 const openLink = document.getElementById('openNewTab');
 
-function activate(key, push){
+function activate(key) {
   const item = [...navItems].find(n => n.dataset.key === key);
-  if(!item) return;
+  if (!item) return;
   navItems.forEach(n => n.classList.remove('active'));
   item.classList.add('active');
   const src = item.dataset.src;
-  if(frame.getAttribute('src') !== src){ frame.setAttribute('src', src); }
+  if (!frame.getAttribute('src').startsWith(src)) { frame.setAttribute('src', src); }
   frame.title = item.dataset.label;
   crumb.textContent = item.dataset.label;
   openLink.href = src;
-  try{ localStorage.setItem('ocsSuiteLastTool', key); }catch(e){}
+  try { localStorage.setItem('ocsSuiteLastTool', key); } catch (e) {}
 }
 
 navItems.forEach(item => {
   item.addEventListener('click', () => activate(item.dataset.key));
 });
 
-let initial = 'pricing';
-try{
+let initialTool = 'pricing';
+try {
   const saved = localStorage.getItem('ocsSuiteLastTool');
-  if(saved && [...navItems].some(n => n.dataset.key === saved)) initial = saved;
-}catch(e){}
-activate(initial);
+  if (saved && [...navItems].some(n => n.dataset.key === saved)) initialTool = saved;
+} catch (e) {}
+activate(initialTool);
+
+// ════════════════════════════════════════════════════════════════════════════
+//  SHARED DATA HUB — one upload, every tool reads from it
+// ════════════════════════════════════════════════════════════════════════════
+const HUB_DB_NAME = 'OcsHubDB', HUB_DB_VER = 1, HUB_STORE = 'files';
+let HUB_FILES = [];
+let _hubDB = null;
+
+function hubOpenDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(HUB_DB_NAME, HUB_DB_VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(HUB_STORE)) db.createObjectStore(HUB_STORE, { keyPath: 'name' });
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+async function hubDB() { if (!_hubDB) _hubDB = await hubOpenDB(); return _hubDB; }
+
+async function hubSaveFile(file) {
+  const db = await hubDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(HUB_STORE, 'readwrite');
+    tx.objectStore(HUB_STORE).put({ name: file.name, size: file.size, lastModified: file.lastModified, blob: file });
+    tx.oncomplete = resolve; tx.onerror = e => reject(e.target.error);
+  });
+}
+async function hubDeleteFile(name) {
+  const db = await hubDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(HUB_STORE, 'readwrite');
+    tx.objectStore(HUB_STORE).delete(name);
+    tx.oncomplete = resolve; tx.onerror = e => reject(e.target.error);
+  });
+}
+async function hubClearDB() {
+  const db = await hubDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(HUB_STORE, 'readwrite');
+    tx.objectStore(HUB_STORE).clear();
+    tx.oncomplete = resolve; tx.onerror = e => reject(e.target.error);
+  });
+}
+async function hubLoadAll() {
+  const db = await hubDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(HUB_STORE, 'readonly');
+    const req = tx.objectStore(HUB_STORE).getAll();
+    req.onsuccess = () => resolve(req.result.map(r => new File([r.blob], r.name, { lastModified: r.lastModified || Date.now() })));
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+// lightweight month/year detection for display only — each tool does its own
+// (more thorough) detection internally once it receives the actual file.
+const HUB_MMAP = { jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12,
+  january:1,february:2,march:3,april:4,june:6,july:7,august:8,september:9,october:10,november:11,december:12 };
+const HUB_MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function hubParseDate(name) {
+  const low = name.toLowerCase();
+  for (const [k, v] of Object.entries(HUB_MMAP)) {
+    if (new RegExp('\\b' + k + '\\b').test(low)) {
+      const yr = low.match(/20\d\d/);
+      return { month: v, year: yr ? parseInt(yr[0]) : null };
+    }
+  }
+  return { month: null, year: null };
+}
+function hubFmtDate(d) { return d.month ? HUB_MN[d.month - 1] + (d.year ? ' ' + d.year : '') : 'no date found'; }
+
+async function addHubFiles(fileList) {
+  let added = 0;
+  for (const f of fileList) {
+    const ext = f.name.split('.').pop().toLowerCase();
+    if (!['xlsx', 'xls', 'csv'].includes(ext)) continue;
+    HUB_FILES = HUB_FILES.filter(x => x.name !== f.name);
+    HUB_FILES.push(f);
+    try { await hubSaveFile(f); added++; } catch (e) { console.error('Save failed for', f.name, e); }
+  }
+  renderHubList();
+  if (added) pushFilesToFrame();
+}
+async function removeHubFile(name) {
+  HUB_FILES = HUB_FILES.filter(f => f.name !== name);
+  try { await hubDeleteFile(name); } catch (e) { console.error(e); }
+  renderHubList();
+  reloadCurrentFrame();
+}
+async function clearAllHubFiles() {
+  if (!confirm('Remove all shared files? Each tool will need fresh data next time you open it.')) return;
+  HUB_FILES = [];
+  try { await hubClearDB(); } catch (e) { console.error(e); }
+  renderHubList();
+  reloadCurrentFrame();
+}
+
+function renderHubList() {
+  const list = document.getElementById('hubList');
+  const count = document.getElementById('hubCount');
+  const badge = document.getElementById('hubBadge');
+  const launchSub = document.getElementById('hubLaunchSub');
+
+  if (!HUB_FILES.length) {
+    list.innerHTML = '<div class="hub-empty">No files yet — drop your monthly OCS exports above.</div>';
+  } else {
+    list.innerHTML = [...HUB_FILES].sort((a, b) => a.name.localeCompare(b.name)).map(f => {
+      const d = hubParseDate(f.name);
+      return `<div class="hub-item">
+        <span class="hub-item-name" title="${f.name}">${f.name}</span>
+        <span class="hub-item-date${d.month ? '' : ' nodate'}">${hubFmtDate(d)}</span>
+        <span class="hub-item-size">${(f.size / 1024).toFixed(0)} KB</span>
+        <button class="hub-item-del" onclick="removeHubFile(${JSON.stringify(f.name)})" title="Remove">✕</button>
+      </div>`;
+    }).join('');
+  }
+  const n = HUB_FILES.length;
+  count.textContent = n + ' file' + (n !== 1 ? 's' : '') + ' loaded';
+  badge.textContent = n;
+  badge.style.display = n ? 'flex' : 'none';
+  launchSub.textContent = n ? n + ' file' + (n !== 1 ? 's' : '') + ' shared' : 'Drop monthly files once';
+}
+
+function pushFilesToFrame() {
+  if (!HUB_FILES.length) return;
+  try { frame.contentWindow.postMessage({ type: 'ocs-hub-files', files: HUB_FILES }, '*'); } catch (e) { console.error(e); }
+  const item = [...navItems].find(n => frame.getAttribute('src').startsWith(n.dataset.src));
+  if (item) item.classList.add('synced');
+}
+function reloadCurrentFrame() {
+  const base = frame.getAttribute('src').split('?')[0];
+  navItems.forEach(n => n.classList.remove('synced'));
+  frame.setAttribute('src', base + '?_r=' + Date.now());
+}
+// re-push current data set every time a tool finishes (re)loading —
+// each tool's iframe is replaced on tab switch, so it always starts fresh
+frame.addEventListener('load', () => { if (HUB_FILES.length) setTimeout(pushFilesToFrame, 30); });
+
+// upload UI wiring
+document.getElementById('hubInput').addEventListener('change', e => { addHubFiles([...e.target.files]); e.target.value = ''; });
+const hubDz = document.getElementById('hubDz');
+hubDz.addEventListener('click', () => document.getElementById('hubInput').click());
+hubDz.addEventListener('dragover', e => { e.preventDefault(); hubDz.classList.add('drag-over'); });
+hubDz.addEventListener('dragleave', () => hubDz.classList.remove('drag-over'));
+hubDz.addEventListener('drop', e => { e.preventDefault(); hubDz.classList.remove('drag-over'); addHubFiles([...e.dataTransfer.files]); });
+
+function openHub() { document.getElementById('hubOverlay').classList.add('on'); }
+function closeHub() { document.getElementById('hubOverlay').classList.remove('on'); }
+document.getElementById('hubOverlay').addEventListener('click', e => { if (e.target.id === 'hubOverlay') closeHub(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHub(); });
+
+// boot: restore previously-uploaded files from IndexedDB
+(async function bootHub() {
+  try { HUB_FILES = await hubLoadAll(); } catch (e) { console.error('Hub restore failed:', e); }
+  renderHubList();
+  pushFilesToFrame(); // covers the case where the initial iframe already finished loading
+})();
 </script>
 
 </body>

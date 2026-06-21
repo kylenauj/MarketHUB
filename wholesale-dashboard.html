@@ -2091,7 +2091,23 @@ function runSegmentComparator(){
 // GO
 document.getElementById('chart-overlay').addEventListener('click',function(e){if(e.target===this)closeChartOverlay();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeChartOverlay();});
-init();
+const _hubInitDone = init();
+
+// ── SHARED DATA HUB BRIDGE ───────────────────────────────────────────────────
+// Receives files pushed from the suite shell (index.html) and runs them
+// through the exact same import pipeline the upload modal already uses
+// (column auto-detect/mapping + IndexedDB period storage stay untouched).
+window.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'ocs-hub-files') return;
+  const files = e.data.files || [];
+  if (!files.length) return;
+  _hubInitDone.then(() => {
+    try {
+      addToQueue(files);
+      setTimeout(runImport, 60);
+    } catch (err) { console.error('Hub data load failed:', err); }
+  });
+});
 </script>
 </body>
 </html>
