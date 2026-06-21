@@ -2286,6 +2286,23 @@ function tlToggle(id) {
   node.classList.toggle('tl-collapsed');
 }
 
+  function saveToRepo() {
+      const now = new Date();
+      const label = now.toLocaleString('en-CA', { month: 'long', year: 'numeric' }) + ' OCS data';
+      const payload = JSON.stringify({
+            label,
+            market: marketData.market,
+            skus:   skuData,
+            brands: brandData
+      }, null, 2);
+      const blob = new Blob([payload], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'pricing.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+  }
+
 
 // — Auto-load latest data from repo —
   fetch('data/pricing.json?_=' + Date.now())
