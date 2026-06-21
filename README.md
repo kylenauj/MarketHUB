@@ -1,4 +1,4 @@
-# OCS Suite — Buddy Blooms
+# OCS Suite — Market Hub
 
 Internal dashboard hub for OCS wholesale pricing and sales data.
 
