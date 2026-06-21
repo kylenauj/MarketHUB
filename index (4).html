@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCS Suite · Buddy Blooms</title>
+<style>
+:root{
+  --bg:#0a0c10;
+  --surface:#0f131a;
+  --surface2:#151a22;
+  --border:#1f2630;
+  --text:#eef1f5;
+  --muted:#6c7686;
+  --muted2:#414c5c;
+  --lime:#b5f04c;
+  --amber:#f59e0b;
+  --green:#22c08a;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,system-ui,sans-serif;
+  --mono:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:264px;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:10;
+}
+.brand{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+.brand-mark{display:flex;align-items:center;gap:9px;margin-bottom:3px;}
+.brand-dot{width:7px;height:7px;border-radius:2px;background:var(--lime);box-shadow:0 0 10px var(--lime);}
+.brand-name{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text);}
+.brand-sub{font-size:10.5px;color:var(--muted);letter-spacing:.02em;padding-left:16px;}
+
+.nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;}
+.nav-item{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:11px 12px;border-radius:9px;cursor:pointer;
+  border:1px solid transparent;border-left:2px solid transparent;
+  background:transparent;text-align:left;width:100%;
+  transition:background .14s, border-color .14s;
+}
+.nav-item:hover{background:var(--surface2);}
+.nav-item.active{background:var(--surface2);border-color:var(--border);}
+.nav-icon{
+  width:30px;height:30px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);border:1px solid var(--border);
+  color:var(--muted);transition:color .14s, border-color .14s;
+}
+.nav-item.active .nav-icon,.nav-item:hover .nav-icon{color:var(--item-accent);border-color:var(--item-accent);}
+.nav-item svg{width:15px;height:15px;}
+.nav-text{flex:1;min-width:0;}
+.nav-title{font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.nav-desc{font-size:11px;color:var(--muted);line-height:1.4;}
+.nav-item[data-key="pricing"]{--item-accent:var(--lime);}
+.nav-item[data-key="wholesale"]{--item-accent:var(--amber);}
+.nav-item[data-key="vape"]{--item-accent:var(--green);}
+.nav-item.active{border-left-color:var(--item-accent);}
+
+.sidebar-foot{padding:14px 20px 18px;border-top:1px solid var(--border);}
+.foot-line{font-size:10.5px;color:var(--muted2);line-height:1.6;}
+.foot-line b{color:var(--muted);font-weight:600;}
+
+/* MAIN */
+.main{position:fixed;top:0;left:264px;right:0;bottom:0;display:flex;flex-direction:column;background:var(--bg);}
+.topbar{
+  height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;border-bottom:1px solid var(--border);background:var(--surface);
+}
+.topbar-title{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted);}
+.topbar-title b{color:var(--text);font-weight:600;}
+.crumb-sep{color:var(--muted2);}
+.topbar-actions{display:flex;align-items:center;gap:14px;}
+.topbar-link{
+  font-size:11.5px;color:var(--muted);text-decoration:none;
+  display:flex;align-items:center;gap:5px;transition:color .14s;
+}
+.topbar-link:hover{color:var(--text);}
+.topbar-link svg{width:12px;height:12px;}
+
+.frame-wrap{flex:1;position:relative;}
+.frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;background:#fff;}
+
+/* MOBILE */
+@media(max-width:880px){
+  .sidebar{position:fixed;width:100%;height:auto;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid var(--border);}
+  .brand{display:none;}
+  .nav{flex-direction:row;padding:10px;overflow-x:auto;overflow-y:hidden;}
+  .nav-item{flex:0 0 auto;width:auto;flex-direction:row;}
+  .nav-desc{display:none;}
+  .sidebar-foot{display:none;}
+  .main{left:0;top:64px;}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <div class="brand-dot"></div>
+      <div class="brand-name">OCS Suite</div>
+    </div>
+    <div class="brand-sub">Buddy Blooms · internal tools</div>
+  </div>
+
+  <nav class="nav" id="nav">
+    <button class="nav-item" data-key="pricing" data-src="pricing-intelligence.html" data-label="Pricing Intelligence">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+      </div>
+      <div class="nav-text">
+        <div class="nav-title">Pricing Intelligence</div>
+        <div class="nav-desc">Landed-cost calculator &amp; market price positioning</div>
+      </div>
+    </button>
+
+    <button class="nav-item" data-key="wholesale" data-src="wholesale-dashboard.html" data-label="Wholesale Dashboard">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16V8"/><path d="M17 16v-7"/></svg>
+      </div>
+      <div class="nav-text">
+        <div class="nav-title">Wholesale Dashboard</div>
+        <div class="nav-desc">Monthly OCS sales trends, rankings &amp; comparisons</div>
+      </div>
+    </button>
+
+    <button class="nav-item" data-key="vape" data-src="vape-flavour-intelligence.html" data-label="Vape Flavour Intelligence">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c2 3 4 5.5 4 9a4 4 0 0 1-8 0c0-3.5 2-6 4-9Z"/></svg>
+      </div>
+      <div class="nav-text">
+        <div class="nav-title">Vape Flavour Intelligence</div>
+        <div class="nav-desc">Fruit-flavour share &amp; SKU performance for vapes</div>
+      </div>
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="foot-line"><b>Mera Cannabis Corp.</b><br>27 Sparling Road, St. Thomas, ON</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">OCS Suite <span class="crumb-sep">/</span> <b id="crumbLabel">Pricing Intelligence</b></div>
+    <div class="topbar-actions">
+      <a class="topbar-link" id="openNewTab" href="pricing-intelligence.html" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+        Open in new tab
+      </a>
+    </div>
+  </div>
+  <div class="frame-wrap">
+    <iframe id="toolFrame" src="pricing-intelligence.html" title="Pricing Intelligence"></iframe>
+  </div>
+</div>
+
+<script>
+const navItems = document.querySelectorAll('.nav-item');
+const frame = document.getElementById('toolFrame');
+const crumb = document.getElementById('crumbLabel');
+const openLink = document.getElementById('openNewTab');
+
+function activate(key, push){
+  const item = [...navItems].find(n => n.dataset.key === key);
+  if(!item) return;
+  navItems.forEach(n => n.classList.remove('active'));
+  item.classList.add('active');
+  const src = item.dataset.src;
+  if(frame.getAttribute('src') !== src){ frame.setAttribute('src', src); }
+  frame.title = item.dataset.label;
+  crumb.textContent = item.dataset.label;
+  openLink.href = src;
+  try{ localStorage.setItem('ocsSuiteLastTool', key); }catch(e){}
+}
+
+navItems.forEach(item => {
+  item.addEventListener('click', () => activate(item.dataset.key));
+});
+
+let initial = 'pricing';
+try{
+  const saved = localStorage.getItem('ocsSuiteLastTool');
+  if(saved && [...navItems].some(n => n.dataset.key === saved)) initial = saved;
+}catch(e){}
+activate(initial);
+</script>
+
+</body>
+</html>
