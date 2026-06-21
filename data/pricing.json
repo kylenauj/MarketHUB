@@ -1,7 +1,6 @@
 {
-    "_note": "Replace this file each month with output from the export script. See README for format.",
-    "label": "No data loaded — drop an OCS export to update",
-    "market": {},
-    "skus": {},
-    "brands": {}
+  "label": "June 2026 OCS data",
+  "market": {},
+  "skus": {},
+  "brands": {}
 }
